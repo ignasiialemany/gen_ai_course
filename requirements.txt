@@ -1,0 +1,7 @@
+# ml_fp — 1D generative-AI curriculum. Pinned to the env N0 was built on.
+jax[cpu]>=0.10
+optax>=0.2.8
+numpy>=2.0
+scipy>=1.13
+matplotlib>=3.8
+ipykernel>=6.29
