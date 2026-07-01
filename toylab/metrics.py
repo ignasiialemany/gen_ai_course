@@ -66,3 +66,22 @@ def wasserstein1_cdf(pdf_a, pdf_b, grid):
     Fa = Fa / Fa[-1]                       # make them proper CDFs (end at 1)
     Fb = Fb / Fb[-1]
     return jnp.sum(jnp.abs(Fa - Fb)) * dx
+
+
+# --- 2D approximation (promoted at N3) ------------------------------------
+def kl_grid_2d(pdf_a, pdf_b, axis):
+    """KL(a || b) from two densities on a shared n×n SQUARE grid (the 'exact' toy KL in 2D).
+
+    pdf_a, pdf_b : (n,n) densities sampled on meshgrid of `axis` (same for both dims).
+    axis         : (n,) the shared 1D coordinate (cell area = (axis[1]-axis[0])**2).
+
+    Same idea as the 1D kl_grid — a Riemann sum of p log(p/q) over cells — but note this
+    is why KL gets *expensive* in higher D: the grid has n**D cells (N0's exit question).
+    """
+    cell = (axis[1] - axis[0]) ** 2
+    pa = pdf_a * cell
+    pb = pdf_b * cell
+    pa = pa / pa.sum()
+    pb = pb / pb.sum()
+    mask = pa > 0
+    return jnp.sum(jnp.where(mask, pa * jnp.log(pa / jnp.where(pb > 0, pb, 1.0)), 0.0))
